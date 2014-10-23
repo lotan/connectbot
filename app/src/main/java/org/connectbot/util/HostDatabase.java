@@ -264,7 +264,7 @@ public class HostDatabase extends RobustSQLiteOpenHelper {
 
 	/**
 	 * Touch a specific host to update its "last connected" field.
-	 * @param nickname Nickname field of host to update
+	 * @param host host to update
 	 */
 	public void touchHost(HostBean host) {
 		long now = System.currentTimeMillis() / 1000;
@@ -352,10 +352,6 @@ public class HostDatabase extends RobustSQLiteOpenHelper {
 		return hosts;
 	}
 
-	/**
-	 * @param hosts
-	 * @param c
-	 */
 	private List<HostBean> createHostBeans(Cursor c) {
 		List<HostBean> hosts = new LinkedList<HostBean>();
 
@@ -424,13 +420,7 @@ public class HostDatabase extends RobustSQLiteOpenHelper {
 	}
 
 	/**
-	 * @param nickname
-	 * @param protocol
-	 * @param username
-	 * @param hostname
-	 * @param hostname2
-	 * @param port
-	 * @return
+	 * Find an entry in the database for this host according to provided selection criteria.
 	 */
 	public HostBean findHost(Map<String, String> selection) {
 		StringBuilder selectionBuilder = new StringBuilder();

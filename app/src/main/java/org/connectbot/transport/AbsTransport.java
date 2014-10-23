@@ -59,7 +59,7 @@ public abstract class AbsTransport {
 	 * Encode the current transport into a URI that can be passed via intent calls.
 	 * @return URI to host
 	 */
-	public static Uri getUri(String input) {
+	public static TransportAddress getUri(String input) {
 		return null;
 	}
 
@@ -214,30 +214,24 @@ public abstract class AbsTransport {
 	public abstract boolean isSessionOpen();
 
 	/**
-	 * @return int default port for protocol
+	 * @return default port for the protocol
 	 */
 	public abstract int getDefaultPort();
 
 	/**
-	 * @param username
-	 * @param hostname
-	 * @param port
-	 * @return
+	 * Returns the default nickname for a given address.
 	 */
-	public abstract String getDefaultNickname(String username, String hostname, int port);
+	public abstract String getDefaultNickname(TransportAddress address);
 
 	/**
-	 * @param uri
-	 * @param selectionKeys
-	 * @param selectionValues
+	 * Adds selection arguments for a database query.
 	 */
-	public abstract void getSelectionArgs(Uri uri, Map<String, String> selection);
+	public abstract void getSelectionArgs(TransportAddress address, Map<String, String> selection);
 
 	/**
-	 * @param uri
-	 * @return
+	 * Creates a {@link HostBean} from a given address.
 	 */
-	public abstract HostBean createHost(Uri uri);
+	public abstract HostBean createHost(TransportAddress address);
 
 	/**
 	 * @param context context containing the correct resources

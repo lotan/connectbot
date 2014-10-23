@@ -80,10 +80,6 @@ public class SSH extends AbsTransport implements ConnectionMonitor, InteractiveC
 		super();
 	}
 
-	/**
-	 * @param bridge
-	 * @param db
-	 */
 	public SSH(HostBean host, TerminalBridge bridge, TerminalManager manager) {
 		super(host, bridge, manager);
 	}
@@ -290,7 +286,7 @@ public class SSH extends AbsTransport implements ConnectionMonitor, InteractiveC
 
 	/**
 	 * Attempt connection with database row pointed to by cursor.
-	 * @param cursor
+	 * @param pubkey
 	 * @return true for successful authentication
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeySpecException
@@ -742,27 +738,29 @@ public class SSH extends AbsTransport implements ConnectionMonitor, InteractiveC
 	}
 
 	@Override
-	public String getDefaultNickname(String username, String hostname, int port) {
-		if (port == DEFAULT_PORT) {
-			return String.format(Locale.US, "%s@%s", username, hostname);
+	public String getDefaultNickname(TransportAddress address) {
+		if (address.getPort() == DEFAULT_PORT) {
+			return String.format(Locale.US, "%s@%s", address.getUsername(), address.getHostname());
 		} else {
-			return String.format(Locale.US, "%s@%s:%d", username, hostname, port);
+			return String.format(Locale.US, "%s@%s:%d", address.getUsername(), address.getHostname(), address.getPort());
 		}
 	}
 
-	public static Uri getUri(String input) {
+	public static TransportAddress getUri(String input) {
 		Matcher matcher = hostmask.matcher(input);
 
 		if (!matcher.matches())
 			return null;
 
-		StringBuilder sb = new StringBuilder();
+		String username = matcher.group(1);
+		String hostname = matcher.group(2);
 
-		sb.append(PROTOCOL)
-			.append("://")
-			.append(Uri.encode(matcher.group(1)))
-			.append('@')
-			.append(matcher.group(2));
+		// IPv6 literals are surrounded with brackets.
+		if (hostname.startsWith("[") && hostname.endsWith("]")) {
+			hostname = new String(hostname.substring(1, hostname.length() - 1));
+		}
+
+		StringBuilder sb = new StringBuilder();
 
 		String portString = matcher.group(4);
 		int port = DEFAULT_PORT;
@@ -777,17 +775,7 @@ public class SSH extends AbsTransport implements ConnectionMonitor, InteractiveC
 			}
 		}
 
-		if (port != DEFAULT_PORT) {
-			sb.append(':')
-				.append(port);
-		}
-
-		sb.append("/#")
-			.append(Uri.encode(input));
-
-		Uri uri = Uri.parse(sb.toString());
-
-		return uri;
+		return new TransportAddress(SSH.class, username, hostname, port, input);
 	}
 
 	/**
@@ -804,42 +792,42 @@ public class SSH extends AbsTransport implements ConnectionMonitor, InteractiveC
 	}
 
 	@Override
-	public HostBean createHost(Uri uri) {
+	public HostBean createHost(TransportAddress address) {
 		HostBean host = new HostBean();
 
 		host.setProtocol(PROTOCOL);
 
-		host.setHostname(uri.getHost());
+		host.setHostname(address.getHostname());
 
-		int port = uri.getPort();
-		if (port < 0)
+		int port = address.getPort();
+		if (port < 0 || port >= 65336) {
 			port = DEFAULT_PORT;
+		}
 		host.setPort(port);
 
-		host.setUsername(uri.getUserInfo());
+		host.setUsername(address.getUsername());
 
-		String nickname = uri.getFragment();
+		String nickname = address.getInput();
 		if (nickname == null || nickname.length() == 0) {
-			host.setNickname(getDefaultNickname(host.getUsername(),
-					host.getHostname(), host.getPort()));
-		} else {
-			host.setNickname(uri.getFragment());
+			nickname = getDefaultNickname(address);
 		}
+		host.setNickname(nickname);
 
 		return host;
 	}
 
 	@Override
-	public void getSelectionArgs(Uri uri, Map<String, String> selection) {
+	public void getSelectionArgs(TransportAddress address, Map<String, String> selection) {
 		selection.put(HostDatabase.FIELD_HOST_PROTOCOL, PROTOCOL);
-		selection.put(HostDatabase.FIELD_HOST_NICKNAME, uri.getFragment());
-		selection.put(HostDatabase.FIELD_HOST_HOSTNAME, uri.getHost());
+		selection.put(HostDatabase.FIELD_HOST_NICKNAME, address.getInput());
+		selection.put(HostDatabase.FIELD_HOST_HOSTNAME, address.getHostname());
 
-		int port = uri.getPort();
-		if (port < 0)
+		int port = address.getPort();
+		if (port <= 0 || port >= 65536) {
 			port = DEFAULT_PORT;
+		}
 		selection.put(HostDatabase.FIELD_HOST_PORT, Integer.toString(port));
-		selection.put(HostDatabase.FIELD_HOST_USERNAME, uri.getUserInfo());
+		selection.put(HostDatabase.FIELD_HOST_USERNAME, address.getUsername());
 	}
 
 	@Override

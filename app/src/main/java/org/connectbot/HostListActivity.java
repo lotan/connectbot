@@ -22,6 +22,7 @@ import java.util.List;
 import org.connectbot.bean.HostBean;
 import org.connectbot.service.TerminalBridge;
 import org.connectbot.service.TerminalManager;
+import org.connectbot.transport.TransportAddress;
 import org.connectbot.transport.TransportFactory;
 import org.connectbot.util.HostDatabase;
 import org.connectbot.util.PreferenceConstants;
@@ -388,15 +389,11 @@ public class HostListActivity extends ListActivity {
 		});
 	}
 
-	/**
-	 * @param text
-	 * @return
-	 */
 	private boolean startConsoleActivity() {
-		Uri uri = TransportFactory.getUri((String) transportSpinner
+		TransportAddress address = TransportFactory.getTransportAddress((String) transportSpinner
 				.getSelectedItem(), quickconnect.getText().toString());
 
-		if (uri == null) {
+		if (address == null) {
 			quickconnect.setError(getString(R.string.list_format_error,
 					TransportFactory.getFormatHint(
 							(String) transportSpinner.getSelectedItem(),
@@ -404,16 +401,16 @@ public class HostListActivity extends ListActivity {
 			return false;
 		}
 
-		HostBean host = TransportFactory.findHost(hostdb, uri);
+		HostBean host = TransportFactory.findHost(hostdb, address);
 		if (host == null) {
-			host = TransportFactory.getTransport(uri.getScheme()).createHost(uri);
+			host = TransportFactory.newTransportFor(address).createHost(address);
 			host.setColor(HostDatabase.COLOR_GRAY);
 			host.setPubkeyId(HostDatabase.PUBKEYID_ANY);
 			hostdb.saveHost(host);
 		}
 
-		Intent intent = new Intent(HostListActivity.this, ConsoleActivity.class);
-		intent.setData(uri);
+		Intent intent = new Intent(getApplicationContext(), ConsoleActivity.class);
+		intent.getExtras().putParcelable(ConsoleActivity.EXTRA_ADDRESS, address);
 		startActivity(intent);
 
 		return true;

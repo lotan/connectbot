@@ -256,7 +256,7 @@ public class TerminalBridge implements VDUDisplay {
 	 * Spawn thread to open connection and start login process.
 	 */
 	protected void startConnection() {
-		transport = TransportFactory.getTransport(host.getProtocol());
+		transport = TransportFactory.newTransportFor(host.getProtocol());
 		transport.setBridge(this);
 		transport.setManager(manager);
 		transport.setHost(host);

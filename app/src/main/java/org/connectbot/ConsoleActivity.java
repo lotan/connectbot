@@ -25,6 +25,8 @@ import org.connectbot.service.PromptHelper;
 import org.connectbot.service.TerminalBridge;
 import org.connectbot.service.TerminalKeyListener;
 import org.connectbot.service.TerminalManager;
+import org.connectbot.transport.TransportAddress;
+import org.connectbot.transport.TransportFactory;
 import org.connectbot.util.PreferenceConstants;
 
 import android.annotation.TargetApi;
@@ -83,6 +85,8 @@ import de.mud.terminal.vt320;
 public class ConsoleActivity extends Activity {
 	public final static String TAG = "ConnectBot.ConsoleActivity";
 
+	public static final String EXTRA_ADDRESS = "org.connectbot.transport.address";
+
 	protected static final int REQUEST_EDIT = 1;
 
 	private static final int CLICK_TIME = 400;
@@ -103,7 +107,7 @@ public class ConsoleActivity extends Activity {
 	// otherwise they collide with an external keyboard's CTRL-char
 	private boolean hardKeyboard = false;
 
-	protected Uri requested;
+	protected TransportAddress requested;
 
 	protected ClipboardManager clipboard;
 	private RelativeLayout stringPromptGroup;
@@ -155,7 +159,7 @@ public class ConsoleActivity extends Activity {
 			// clear out any existing bridges and record requested index
 			flip.removeAllViews();
 
-			final String requestedNickname = (requested != null) ? requested.getFragment() : null;
+			final String requestedNickname = (requested != null) ? requested.getInput() : null;
 			int requestedIndex = 0;
 
 			TerminalBridge requestedBridge = bound.getConnectedBridge(requestedNickname);
@@ -330,7 +334,12 @@ public class ConsoleActivity extends Activity {
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
 		// handle requested console from incoming intent
-		requested = getIntent().getData();
+		Uri targetUri = getIntent().getData();
+		if (targetUri != null) {
+			requested = TransportFactory.getTransportAddress(targetUri);
+		} else {
+			requested = getIntent().getParcelableExtra(EXTRA_ADDRESS);
+		}
 
 		inflater = LayoutInflater.from(this);
 
@@ -917,7 +926,7 @@ public class ConsoleActivity extends Activity {
 
 		Log.d(TAG, "onNewIntent called");
 
-		requested = intent.getData();
+		requested = intent.getParcelableExtra(EXTRA_ADDRESS);
 
 		if (requested == null) {
 			Log.e(TAG, "Got null intent data in onNewIntent()");
@@ -929,7 +938,7 @@ public class ConsoleActivity extends Activity {
 			return;
 		}
 
-		TerminalBridge requestedBridge = bound.getConnectedBridge(requested.getFragment());
+		TerminalBridge requestedBridge = bound.getConnectedBridge(requested.getInput());
 		int requestedIndex = 0;
 
 		synchronized (flip) {
@@ -938,7 +947,7 @@ public class ConsoleActivity extends Activity {
 
 				try {
 					Log.d(TAG, String.format("We couldnt find an existing bridge with URI=%s (nickname=%s),"+
-							"so creating one now", requested.toString(), requested.getFragment()));
+							"so creating one now", requested.toString(), requested.getInput()));
 					requestedBridge = bound.openConnection(requested);
 				} catch(Exception e) {
 					Log.e(TAG, "Problem while trying to create new requested bridge from URI", e);

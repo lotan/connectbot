@@ -123,7 +123,7 @@ public class Local extends AbsTransport {
 	}
 
 	@Override
-	public String getDefaultNickname(String username, String hostname, int port) {
+	public String getDefaultNickname(TransportAddress address) {
 		return DEFAULT_URI;
 	}
 
@@ -172,37 +172,31 @@ public class Local extends AbsTransport {
 			os.write(c);
 	}
 
-	public static Uri getUri(String input) {
+	public static TransportAddress getUri(String input) {
 		Uri uri = Uri.parse(DEFAULT_URI);
 
-		if (input != null && input.length() > 0) {
-			uri = uri.buildUpon().fragment(input).build();
-		}
-
-		return uri;
+		return new TransportAddress(Local.class, null, null, -1, input);
 	}
 
 	@Override
-	public HostBean createHost(Uri uri) {
+	public HostBean createHost(TransportAddress address) {
 		HostBean host = new HostBean();
 
 		host.setProtocol(PROTOCOL);
 
-		String nickname = uri.getFragment();
+		String nickname = address.getInput();
 		if (nickname == null || nickname.length() == 0) {
-			host.setNickname(getDefaultNickname(host.getUsername(),
-					host.getHostname(), host.getPort()));
-		} else {
-			host.setNickname(uri.getFragment());
+			nickname = getDefaultNickname(address);
 		}
+		host.setNickname(nickname);
 
 		return host;
 	}
 
 	@Override
-	public void getSelectionArgs(Uri uri, Map<String, String> selection) {
+	public void getSelectionArgs(TransportAddress address, Map<String, String> selection) {
 		selection.put(HostDatabase.FIELD_HOST_PROTOCOL, PROTOCOL);
-		selection.put(HostDatabase.FIELD_HOST_NICKNAME, uri.getFragment());
+		selection.put(HostDatabase.FIELD_HOST_NICKNAME, address.getInput());
 	}
 
 	public static String getFormatHint(Context context) {

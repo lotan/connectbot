@@ -42,10 +42,17 @@ public class TransportFactory {
 	};
 
 	/**
-	 * @param protocol
-	 * @return
+	 * Returns a new instance of the transport type.
 	 */
-	public static AbsTransport getTransport(String protocol) {
+	public static AbsTransport newTransportFor(TransportAddress address) {
+		try {
+			return address.getTransport().newInstance();
+		} catch (Exception e) {
+			throw new RuntimeException("Error instantiating transport", e);
+		}
+	}
+
+	public static AbsTransport newTransportFor(String protocol) {
 		if (SSH.getProtocolName().equals(protocol)) {
 			return new SSH();
 		} else if (Telnet.getProtocolName().equals(protocol)) {
@@ -57,7 +64,11 @@ public class TransportFactory {
 		}
 	}
 
-	public static Uri getUri(String scheme, String input) {
+	public static TransportAddress getTransportAddress(Uri uri) {
+		return getTransportAddress(uri.getScheme(), uri.toString());
+	}
+
+	public static TransportAddress getTransportAddress(String scheme, String input) {
 		Log.d("TransportFactory", String.format(
 				"Attempting to discover URI for scheme=%s on input=%s", scheme,
 				input));
@@ -111,19 +122,18 @@ public class TransportFactory {
 
 	/**
 	 * @param hostdb Handle to HostDatabase
-	 * @param uri URI to target server
-	 * @param host HostBean in which to put the results
+	 * @param address address to target server
 	 * @return true when host was found
 	 */
-	public static HostBean findHost(HostDatabase hostdb, Uri uri) {
-		AbsTransport transport = getTransport(uri.getScheme());
+	public static HostBean findHost(HostDatabase hostdb, TransportAddress address) {
+		AbsTransport transport = newTransportFor(address);
 
 		Map<String, String> selection = new HashMap<String, String>();
 
-		transport.getSelectionArgs(uri, selection);
+		transport.getSelectionArgs(address, selection);
 		if (selection.size() == 0) {
 			Log.e(TAG, String.format("Transport %s failed to do something useful with URI=%s",
-					uri.getScheme(), uri.toString()));
+					transport.getProtocolName(), address.toString()));
 			throw new IllegalStateException("Failed to get needed selection arguments");
 		}
 

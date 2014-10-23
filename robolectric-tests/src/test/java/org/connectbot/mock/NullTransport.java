@@ -24,6 +24,7 @@ import org.connectbot.bean.HostBean;
 import org.connectbot.service.TerminalBridge;
 import org.connectbot.service.TerminalManager;
 import org.connectbot.transport.AbsTransport;
+import org.connectbot.transport.TransportAddress;
 
 import android.net.Uri;
 
@@ -64,7 +65,7 @@ public class NullTransport extends AbsTransport {
 	}
 
 	@Override
-	public HostBean createHost(Uri uri) {
+	public HostBean createHost(TransportAddress address) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -76,7 +77,7 @@ public class NullTransport extends AbsTransport {
 	}
 
 	@Override
-	public String getDefaultNickname(String username, String hostname, int port) {
+	public String getDefaultNickname(TransportAddress address) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -88,9 +89,8 @@ public class NullTransport extends AbsTransport {
 	}
 
 	@Override
-	public void getSelectionArgs(Uri uri, Map<String, String> selection) {
+	public void getSelectionArgs(TransportAddress address, Map<String, String> selection) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override

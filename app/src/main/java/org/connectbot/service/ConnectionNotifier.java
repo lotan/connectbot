@@ -73,7 +73,7 @@ public abstract class ConnectionNotifier {
 				R.string.notification_text, host.getNickname());
 
 		Intent notificationIntent = new Intent(context, ConsoleActivity.class);
-		notificationIntent.setAction("android.intent.action.VIEW");
+		notificationIntent.setAction(Intent.ACTION_VIEW);
 		notificationIntent.setData(host.getUri());
 
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,

@@ -34,6 +34,7 @@ import java.util.TimerTask;
 import org.connectbot.R;
 import org.connectbot.bean.HostBean;
 import org.connectbot.bean.PubkeyBean;
+import org.connectbot.transport.TransportAddress;
 import org.connectbot.transport.TransportFactory;
 import org.connectbot.util.HostDatabase;
 import org.connectbot.util.PreferenceConstants;
@@ -270,11 +271,11 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 	 * Open a new connection by reading parameters from the given URI. Follows
 	 * format specified by an individual transport.
 	 */
-	public TerminalBridge openConnection(Uri uri) throws Exception {
-		HostBean host = TransportFactory.findHost(hostdb, uri);
+	public TerminalBridge openConnection(TransportAddress address) throws Exception {
+		HostBean host = TransportFactory.findHost(hostdb, address);
 
 		if (host == null)
-			host = TransportFactory.getTransport(uri.getScheme()).createHost(uri);
+			host = TransportFactory.newTransportFor(address).createHost(address);
 
 		return openConnection(host);
 	}

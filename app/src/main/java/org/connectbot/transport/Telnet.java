@@ -232,25 +232,21 @@ public class Telnet extends AbsTransport {
 	}
 
 	@Override
-	public String getDefaultNickname(String username, String hostname, int port) {
-		if (port == DEFAULT_PORT) {
-			return String.format("%s", hostname);
+	public String getDefaultNickname(TransportAddress address) {
+		if (address.getPort() == DEFAULT_PORT) {
+			return String.format("%s", address.getHostname());
 		} else {
-			return String.format("%s:%d", hostname, port);
+			return String.format("%s:%d", address.getHostname(), address.getPort());
 		}
 	}
 
-	public static Uri getUri(String input) {
+	public static TransportAddress getUri(String input) {
 		Matcher matcher = hostmask.matcher(input);
 
 		if (!matcher.matches())
 			return null;
 
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(PROTOCOL)
-			.append("://")
-			.append(matcher.group(1));
+		String hostname = matcher.group(1);
 
 		String portString = matcher.group(3);
 		int port = DEFAULT_PORT;
@@ -265,52 +261,42 @@ public class Telnet extends AbsTransport {
 			}
 		}
 
-		if (port != DEFAULT_PORT) {
-			sb.append(':');
-			sb.append(port);
-		}
-
-		sb.append("/#")
-			.append(Uri.encode(input));
-
-		Uri uri = Uri.parse(sb.toString());
-
-		return uri;
+		return new TransportAddress(Telnet.class, null, hostname, port, input);
 	}
 
 	@Override
-	public HostBean createHost(Uri uri) {
+	public HostBean createHost(TransportAddress address) {
 		HostBean host = new HostBean();
 
 		host.setProtocol(PROTOCOL);
 
-		host.setHostname(uri.getHost());
+		host.setHostname(address.getHostname());
 
-		int port = uri.getPort();
-		if (port < 0)
+		int port = address.getPort();
+		if (port <= 0 || port >= 65536) {
 			port = DEFAULT_PORT;
+		}
 		host.setPort(port);
 
-		String nickname = uri.getFragment();
+		String nickname = address.getInput();
 		if (nickname == null || nickname.length() == 0) {
-			host.setNickname(getDefaultNickname(host.getUsername(),
-					host.getHostname(), host.getPort()));
-		} else {
-			host.setNickname(uri.getFragment());
+			nickname = getDefaultNickname(address);
 		}
+		host.setNickname(nickname);
 
 		return host;
 	}
 
 	@Override
-	public void getSelectionArgs(Uri uri, Map<String, String> selection) {
+	public void getSelectionArgs(TransportAddress address, Map<String, String> selection) {
 		selection.put(HostDatabase.FIELD_HOST_PROTOCOL, PROTOCOL);
-		selection.put(HostDatabase.FIELD_HOST_NICKNAME, uri.getFragment());
-		selection.put(HostDatabase.FIELD_HOST_HOSTNAME, uri.getHost());
+		selection.put(HostDatabase.FIELD_HOST_NICKNAME, address.getInput());
+		selection.put(HostDatabase.FIELD_HOST_HOSTNAME, address.getHostname());
 
-		int port = uri.getPort();
-		if (port < 0)
+		int port = address.getPort();
+		if (port <= 0 || port >= 65536) {
 			port = DEFAULT_PORT;
+		}
 		selection.put(HostDatabase.FIELD_HOST_PORT, Integer.toString(port));
 	}
 
