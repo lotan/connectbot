@@ -96,7 +96,7 @@ public class SSH extends AbsTransport implements ConnectionMonitor, InteractiveC
 
 	static final Pattern hostmask;
 	static {
-		hostmask = Pattern.compile("^(.+)@([0-9a-z.-]+)(:(\\d+))?$", Pattern.CASE_INSENSITIVE);
+		hostmask = Pattern.compile("^(.+)@([0-9a-z.-]+|\\[[0-9a-f:]+\\])(:(\\d+))?$", Pattern.CASE_INSENSITIVE);
 	}
 
 	private boolean compression = false;
