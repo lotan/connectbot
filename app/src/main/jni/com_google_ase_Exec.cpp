@@ -26,17 +26,10 @@
 #include <unistd.h>
 
 #include "android/log.h"
+#include "JNIHelp.h"
 
 #define LOG_TAG "Exec"
 #define LOG(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-
-void JNU_ThrowByName(JNIEnv* env, const char* name, const char* msg) {
-  jclass clazz = env->FindClass(name);
-  if (clazz != NULL) {
-    env->ThrowNew(clazz, msg);
-  }
-  env->DeleteLocalRef(clazz);
-}
 
 char* JNU_GetStringNativeChars(JNIEnv* env, jstring jstr) {
   if (jstr == NULL) {
@@ -57,7 +50,7 @@ char* JNU_GetStringNativeChars(JNIEnv* env, jstring jstr) {
     jint len = env->GetArrayLength(bytes);
     result = (char*) malloc(len + 1);
     if (result == 0) {
-      JNU_ThrowByName(env, "java/lang/OutOfMemoryError", 0);
+      jniThrowException(env, "java/lang/OutOfMemoryError", 0);
       env->DeleteLocalRef(bytes);
       return 0;
     }
@@ -68,13 +61,6 @@ char* JNU_GetStringNativeChars(JNIEnv* env, jstring jstr) {
   }
   env->DeleteLocalRef(bytes);
   return result;
-}
-
-int jniGetFDFromFileDescriptor(JNIEnv* env, jobject fileDescriptor) {
-  jclass Class_java_io_FileDescriptor = env->FindClass("java/io/FileDescriptor");
-  jfieldID descriptor = env->GetFieldID(Class_java_io_FileDescriptor,
-                                        "descriptor", "I");
-  return env->GetIntField(fileDescriptor, descriptor);
 }
 
 static int create_subprocess(
