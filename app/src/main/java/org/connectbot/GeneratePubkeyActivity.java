@@ -153,6 +153,10 @@ public class GeneratePubkeyActivity extends Activity implements OnEntropyGathere
 					bitsText.setEnabled(true);
 
 					keyType = PubkeyDatabase.KEY_TYPE_EC;
+				} else if (checkedId == R.id.ed25519) {
+					bitsSlider.setEnabled(false);
+
+					keyType = PubkeyDatabase.KEY_TYPE_ED25519;
 				}
 			}
 		});
