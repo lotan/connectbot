@@ -432,6 +432,22 @@ public class TerminalBridge implements VDUDisplay {
 		return false;
 	}
 
+	/**
+	 * @return whether a connection is established
+	 */
+	public boolean isConnected() {
+		if (transport != null)
+			return transport.isConnected();
+		return false;
+	}
+
+	/**
+	 * @return whether the host is supposed to be reconnected after disconnection
+	 */
+	public boolean isStayConnected() {
+		return host.getStayConnected();
+	}
+
 	public void setOnDisconnectedListener(BridgeDisconnectedListener disconnectListener) {
 		this.disconnectListener = disconnectListener;
 	}
