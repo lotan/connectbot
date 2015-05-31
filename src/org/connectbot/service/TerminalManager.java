@@ -102,6 +102,9 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 	private Timer idleTimer;
 	private final long IDLE_TIMEOUT = 300000; // 5 minutes
 
+	private Timer reconnectTimer;
+	private final long RECONNECT_DELAY = 300000; // 5 minutes
+
 	private Vibrator vibrator;
 	private volatile boolean wantKeyVibration;
 	public static final long VIBRATE_DURATION = 30;
@@ -124,6 +127,9 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 		res = getResources();
 
 		pubkeyTimer = new Timer("pubkeyTimer", true);
+
+		reconnectTimer = new Timer("reconnectTimer", true);
+		reconnectTimer.scheduleAtFixedRate(new ReconnectTimerTask(), RECONNECT_DELAY, RECONNECT_DELAY);
 
 		hostdb = new HostDatabase(this);
 		pubkeydb = new PubkeyDatabase(this);
@@ -184,6 +190,8 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 				idleTimer.cancel();
 			if (pubkeyTimer != null)
 				pubkeyTimer.cancel();
+			if (reconnectTimer != null)
+				reconnectTimer.cancel();
 		}
 
 		connectivityManager.cleanup();
@@ -527,6 +535,14 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 		}
 	}
 
+	private class ReconnectTimerTask extends TimerTask {
+		@Override
+		public void run() {
+			Log.d(TAG, String.format("Reconnect pending unconnected bridges."));
+			TerminalManager.this.reconnectPending();
+		}
+	}
+
 	public void tryKeyVibrate() {
 		if (wantKeyVibration)
 			vibrate();
@@ -692,7 +708,7 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 	private void reconnectPending() {
 		for (TerminalBridge bridge : bridges) {
 			if (!bridge.isConnected() && bridge.isStayConnected())
-				bridge.startConnection();
+				requestReconnect(bridge);
 		}
 	}
 }
