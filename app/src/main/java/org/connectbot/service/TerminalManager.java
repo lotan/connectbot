@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.connectbot.R;
 import org.connectbot.bean.HostBean;
@@ -105,8 +107,8 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 	private Timer idleTimer;
 	private final long IDLE_TIMEOUT = 300000; // 5 minutes
 
-	private Timer reconnectTimer;
-	private final long RECONNECT_DELAY = 300000; // 5 minutes
+	private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
+	private final long RECONNECT_DELAY = 60000; // 1 minute
 
 	private Vibrator vibrator;
 	private volatile boolean wantKeyVibration;
@@ -131,8 +133,13 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 
 		pubkeyTimer = new Timer("pubkeyTimer", true);
 
-		reconnectTimer = new Timer("reconnectTimer", true);
-		reconnectTimer.scheduleAtFixedRate(new ReconnectTimerTask(), RECONNECT_DELAY, RECONNECT_DELAY);
+		// set up reconnection timer
+		scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+		scheduledThreadPoolExecutor.scheduleWithFixedDelay(new Runnable() {
+				public void run() {
+					Log.d(TAG, String.format("Reconnect pending unconnected bridges."));
+					TerminalManager.this.reconnectPending();
+				}}, RECONNECT_DELAY, RECONNECT_DELAY, TimeUnit.MILLISECONDS);
 
 		hostdb = HostDatabase.get(this);
 		colordb = HostDatabase.get(this);
@@ -185,8 +192,8 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 				idleTimer.cancel();
 			if (pubkeyTimer != null)
 				pubkeyTimer.cancel();
-			if (reconnectTimer != null)
-				reconnectTimer.cancel();
+			if (scheduledThreadPoolExecutor != null)
+				scheduledThreadPoolExecutor.shutdown();
 		}
 
 		connectivityManager.cleanup();
@@ -554,14 +561,6 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 		}
 	}
 
-	private class ReconnectTimerTask extends TimerTask {
-		@Override
-		public void run() {
-			Log.d(TAG, String.format("Reconnect pending unconnected bridges."));
-			TerminalManager.this.reconnectPending();
-		}
-	}
-
 	public void tryKeyVibrate() {
 		if (wantKeyVibration)
 			vibrate();
@@ -710,10 +709,11 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 	 * @param bridge the TerminalBridge to reconnect when possible
 	 */
 	public void requestReconnect(TerminalBridge bridge) {
-
-		if (!bridge.isUsingNetwork() ||
-				connectivityManager.isConnected()) {
-			bridge.startConnection();
+		synchronized (bridges) {
+			if (!bridge.isUsingNetwork() ||
+					connectivityManager.isConnected()) {
+				bridge.startConnection();
+			}
 		}
 	}
 
