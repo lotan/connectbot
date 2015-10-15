@@ -723,4 +723,28 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 				requestReconnect(bridge);
 		}
 	}
+
+	/**
+	 * Register a {@code listener} that wants to know when a host's status materially changes.
+	 * @see #hostStatusChangedListeners
+	 */
+	public void registerOnHostStatusChangedListener(OnHostStatusChangedListener listener) {
+		if (!hostStatusChangedListeners.contains(listener)) {
+			hostStatusChangedListeners.add(listener);
+		}
+	}
+
+	/**
+	 * Unregister a {@code listener} that wants to know when a host's status materially changes.
+	 * @see #hostStatusChangedListeners
+	 */
+	public void unregisterOnHostStatusChangedListener(OnHostStatusChangedListener listener) {
+		hostStatusChangedListeners.remove(listener);
+	}
+
+	private void notifyHostStatusChanged() {
+		for (OnHostStatusChangedListener listener : hostStatusChangedListeners) {
+			listener.onHostStatusChanged();
+		}
+	}
 }
