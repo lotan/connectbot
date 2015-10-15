@@ -17,12 +17,11 @@
   <string name="help_about">A ConnectBot névjegye</string>
   <string name="help_keyboard">Billentyűzet</string>
   <string name="pubkey_generate">Generálás</string>
-  <string name="pubkey_import">Importálás</string>
   <string name="pubkey_delete">Kulcs törlése</string>
   <string name="pubkey_gather_entropy">Entrópia gyűjtés</string>
   <string name="pubkey_touch_prompt">Érintse meg a dobozt a véletlenszerű generálásához: %1$d%% kész</string>
   <string name="pubkey_touch_hint">A kulcs egyediségének biztosítása érdekében mozgassa ujját véletlenszerűen az alábbi dobozban.</string>
-  <string name="pubkey_generating">Kulcspár generálása...</string>
+  <string name="pubkey_generating">Kulcspár generálása…</string>
   <string name="pubkey_copy_private">Privát kulcs másolása</string>
   <string name="pubkey_copy_public">Nyilvános kulcs másolása</string>
   <string name="pubkey_list_empty">Nyomjon Menu-t, kulcspár\n létrehozáshoz/importáláshoz.</string>
@@ -140,7 +139,6 @@
   <string name="portforward_pos">Port átirányítás létrehozása</string>
   <string name="portforward_done">Sikeres port átirányítás</string>
   <string name="portforward_problem">Probléma a port átirányítás létrehozása során, 1024 alatti vagy már használatban lévő portot választott?</string>
-  <string name="portforward_menu_add">Port átirányítás hozzáadása</string>
   <string name="hint_userhost">felhasználó\@gépnév</string>
   <string name="list_format_error">A %1$s formátum használata</string>
   <string name="format_username">felhasználónév</string>
@@ -169,9 +167,6 @@
   <string name="delete_message">Biztosan törli a \'%1$s\'-t?</string>
   <string name="delete_pos">Igen, törlés</string>
   <string name="delete_neg">Mégsem</string>
-  <string name="wizard_agree">Elfogad</string>
-  <string name="wizard_next">Következő</string>
-  <string name="wizard_back">Vissza</string>
   <string name="terminal_no_hosts_connected">Nincs csatlakozva</string>
   <string name="terminal_connecting">Csatlakozás %1$s:%2$d a %3$s protokollon</string>
   <string name="terminal_sucess">Azonosított \'%1$s\' gépnév kulcsa: %2$s</string>

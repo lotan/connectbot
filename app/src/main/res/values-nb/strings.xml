@@ -17,12 +17,11 @@
   <string name="help_about">Om ConnectBot</string>
   <string name="help_keyboard">Tastatur</string>
   <string name="pubkey_generate">Generer</string>
-  <string name="pubkey_import">Importer</string>
   <string name="pubkey_delete">Slett nøkkel</string>
   <string name="pubkey_gather_entropy">Samler entropi</string>
   <string name="pubkey_touch_prompt">Berør denne boksen for å samle tilfeldige tall: %1$d%% ferdig</string>
   <string name="pubkey_touch_hint">Beveg fingeren over boksen nedenfor for å sikre vilkårlighet ved generering av nøkkel.</string>
-  <string name="pubkey_generating">Genererer nøkkelpar...</string>
+  <string name="pubkey_generating">Genererer nøkkelpar…</string>
   <string name="pubkey_copy_private">Kopier privat nøkkel</string>
   <string name="pubkey_copy_public">Kopier offentlig nøkkel</string>
   <string name="pubkey_list_empty">Trykk \"Meny\" for å opprette\neller importere nøkkelpar.</string>
@@ -140,7 +139,6 @@
   <string name="portforward_pos">Opprett portvideresending</string>
   <string name="portforward_done">Vellykket oppretting av portvideresending</string>
   <string name="portforward_problem">Mislyktes å opprette portvideresending. Bruker du porter under 1024, eller er denne porten allerede tatt?</string>
-  <string name="portforward_menu_add">Legg til portvideresending</string>
   <string name="hint_userhost">bruker\@vert</string>
   <string name="list_format_error">Use the format %1$s</string>
   <string name="format_username">brukernavn</string>
@@ -169,9 +167,6 @@
   <string name="delete_message">Er du sikker på at du vil slette \'%1$s\'?</string>
   <string name="delete_pos">Ja, slett</string>
   <string name="delete_neg">Avbryt</string>
-  <string name="wizard_agree">Godta</string>
-  <string name="wizard_next">Neste</string>
-  <string name="wizard_back">Tilbake</string>
   <string name="terminal_no_hosts_connected">Ingen verter tilkoblet for øyeblikket</string>
   <string name="terminal_connecting">Kobler til %1$s:%2$d via %3$s</string>
   <string name="terminal_sucess">Verifiserte vert \'%1$s\' sin nøkkel: %2$s</string>

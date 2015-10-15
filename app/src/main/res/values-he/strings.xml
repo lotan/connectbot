@@ -18,12 +18,11 @@
   <string name="help_about">על אודות ConnectBot</string>
   <string name="help_keyboard">מקלדת</string>
   <string name="pubkey_generate">יצירה</string>
-  <string name="pubkey_import">יבוא</string>
   <string name="pubkey_delete">מחיקת מפתח</string>
   <string name="pubkey_gather_entropy">נאסף גיבוב</string>
   <string name="pubkey_touch_prompt">יש לגעת בתיבה זו כדי לאסוף נתונים אקראיים: %1$d%% הושלמו</string>
   <string name="pubkey_touch_hint">כדי להבטיח את האקראיות במהלך יצירת המפתח, עליך להעביר את האצבע באקראיות על התיבה שלהלן.</string>
-  <string name="pubkey_generating">צמד המפתחות נוצר...</string>
+  <string name="pubkey_generating">צמד המפתחות נוצר…</string>
   <string name="pubkey_copy_private">העתקת המפתח הפרטי</string>
   <string name="pubkey_copy_public">העתקת המפתח הציבורי</string>
   <string name="pubkey_list_empty">יש לגעת ב„תפריט“ כדי ליצור\nאו לייבא צמדי מפתחות.</string>
@@ -141,7 +140,6 @@
   <string name="portforward_pos">יצירת הפניית פתחות</string>
   <string name="portforward_done">הפניית הפתחות נוצרה בהצלחה</string>
   <string name="portforward_problem">אירעה שגיאה ביצירת הפניית פתחות, יתכן שניסית להשתמש בפתחות מתחת ל־1024 או שהפתחה כבר בשימוש?</string>
-  <string name="portforward_menu_add">הוספת הפניית פתחות</string>
   <string name="hint_userhost">user\@hostname</string>
   <string name="list_format_error">יש להשתמש בצורה „%1$s“</string>
   <string name="format_username">username</string>
@@ -170,9 +168,6 @@
   <string name="delete_message">האם אכן למחוק את \'%1$s\'?</string>
   <string name="delete_pos">כן, למחוק</string>
   <string name="delete_neg">ביטול</string>
-  <string name="wizard_agree">מוסכם</string>
-  <string name="wizard_next">הבא</string>
-  <string name="wizard_back">הקודם</string>
   <string name="terminal_no_hosts_connected">אין מארחים מחוברים כרגע</string>
   <string name="terminal_connecting">מתבצעת התחברות אל %1$s:%2$d דרך %3$s</string>
   <string name="terminal_sucess">מפתח של המארח המאומת \'%1$s\'‏: %2$s</string>

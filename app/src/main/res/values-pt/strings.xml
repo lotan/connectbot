@@ -17,12 +17,11 @@
   <string name="help_about">Sobre ConnectBot</string>
   <string name="help_keyboard">Teclado</string>
   <string name="pubkey_generate">Gerar</string>
-  <string name="pubkey_import">Importar</string>
   <string name="pubkey_delete">Apagar a chave</string>
   <string name="pubkey_gather_entropy">Recolhendo entropia</string>
   <string name="pubkey_touch_prompt">Toque nesta caixa para gerar aleariedade: %1$d%% completo</string>
   <string name="pubkey_touch_hint">Para assegurar aleatoriedade durante a geração da chave, mova o dedo aleatoriamente sobre a caixa a baixo.</string>
-  <string name="pubkey_generating">A gerar par de chaves</string>
+  <string name="pubkey_generating">A gerar par de chaves…</string>
   <string name="pubkey_copy_private">Copiar chave privada</string>
   <string name="pubkey_copy_public">Copiar chave pública</string>
   <string name="pubkey_list_empty">Carregue em Menu para criar\nou importar as chaves.</string>
@@ -140,7 +139,6 @@
   <string name="portforward_pos">Criar redirecionamento de portas</string>
   <string name="portforward_done">Redirecionamento de porta criado com sucesso</string>
   <string name="portforward_problem">Problema ao criar redirecionamento de porta, talvez esteja a usar portas abaixo de 1024 ou a porta já esteja em uso?</string>
-  <string name="portforward_menu_add">Adicionar redirecionamento de porta</string>
   <string name="hint_userhost">utilizador\@servidor</string>
   <string name="list_format_error">Use o formato %1$s</string>
   <string name="format_username">nome do utilizador</string>
@@ -169,9 +167,6 @@
   <string name="delete_message">Tem a certeza que deseja eliminar \'%1$s\'?</string>
   <string name="delete_pos">Sim, apagar</string>
   <string name="delete_neg">Cancelar</string>
-  <string name="wizard_agree">Aceitar</string>
-  <string name="wizard_next">Seguinte</string>
-  <string name="wizard_back">Retroceder</string>
   <string name="terminal_no_hosts_connected">Nenhum anfitrião ligado actualmente</string>
   <string name="terminal_connecting">A ligar a %1$s:%2$d via %3$s</string>
   <string name="terminal_sucess">Verificado anfitrião \'%1$s\' chave: %2$s</string>

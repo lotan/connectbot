@@ -17,12 +17,11 @@
   <string name="help_about">О ConnectBot</string>
   <string name="help_keyboard">Клавиатура</string>
   <string name="pubkey_generate">Генерировать</string>
-  <string name="pubkey_import">Импортировать</string>
   <string name="pubkey_delete">Удалить ключ</string>
   <string name="pubkey_gather_entropy">Сбор случайной информации</string>
   <string name="pubkey_touch_prompt">Нажмите сюда для генерирования случайной информации: %1$d%% готово</string>
   <string name="pubkey_touch_hint">Для использования случайной выборки во время генерации ключа - перемещайте палец в области экрана ниже.</string>
-  <string name="pubkey_generating">Генерирование пары ключей</string>
+  <string name="pubkey_generating">Генерирование пары ключей…</string>
   <string name="pubkey_copy_private">Копировать приватный ключ</string>
   <string name="pubkey_copy_public">Копировать публичный ключ</string>
   <string name="pubkey_list_empty">Выберите Меню для создания или импорта пары ключей</string>
@@ -143,7 +142,6 @@
   <string name="portforward_pos">Создать перенаправление порта</string>
   <string name="portforward_done">Перенаправление порта успешно завершено</string>
   <string name="portforward_problem">Не удалось создать перенаправление порта. Может быть вы используете порты меньше чем 1024 или пор уже используется?</string>
-  <string name="portforward_menu_add">Добавить перенаправление порта</string>
   <string name="hint_userhost">пользователь\@имяхоста</string>
   <string name="list_format_error">Используйте формат %1$s</string>
   <string name="format_username">имя пользователя</string>
@@ -172,9 +170,6 @@
   <string name="delete_message">Вы уверены, что хотите удалить \'%1$s\'?</string>
   <string name="delete_pos">Да, удалить</string>
   <string name="delete_neg">Отменить</string>
-  <string name="wizard_agree">Соглашаюсь</string>
-  <string name="wizard_next">Далее</string>
-  <string name="wizard_back">Назад</string>
   <string name="terminal_no_hosts_connected">Нет подключенных узлов</string>
   <string name="terminal_connecting">Подключение к %1$s:%2$d через %3$s</string>
   <string name="terminal_sucess">Проверенный узел \'%1$s\' ключ: %2$s</string>

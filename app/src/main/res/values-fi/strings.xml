@@ -17,12 +17,11 @@
   <string name="help_about">Tietoja ConnectBotista</string>
   <string name="help_keyboard">Näppäimistö</string>
   <string name="pubkey_generate">Luo</string>
-  <string name="pubkey_import">Tuo</string>
   <string name="pubkey_delete">Poista avain</string>
   <string name="pubkey_gather_entropy">Kerätään satunnaisdataa</string>
   <string name="pubkey_touch_prompt">Kosketa tätä laatikkoa kerätäksesi satunnaisdataa: %1$d%% valmiina</string>
   <string name="pubkey_touch_hint">Liikuta sormeasi alla olevan laatikon kohdalla sattumanvaraisesti varmistaaksesi avaimen luonnin satunnaisuuden.</string>
-  <string name="pubkey_generating">Luodaan avainparia...</string>
+  <string name="pubkey_generating">Luodaan avainparia…</string>
   <string name="pubkey_copy_private">Kopio yksityinen avain</string>
   <string name="pubkey_copy_public">Kopioi julkinen avain</string>
   <string name="pubkey_list_empty">Paina valikkopainiketta\nluodaksesi tai tuodaksesi\navainpareja.</string>
@@ -139,7 +138,6 @@
   <string name="portforward_pos">Luo porttiohjaus</string>
   <string name="portforward_done">Porttiohjaus luotu onnistuneesti</string>
   <string name="portforward_problem">Ongelma luotaessa porttiohjausta. Ehkä käytät porttia joka on alle 1024 tai portti on jo käytössä?</string>
-  <string name="portforward_menu_add">Lisää porttiohjaus</string>
   <string name="hint_userhost">tunnus\@palvelin</string>
   <string name="list_format_error">Käytä muotoa %1$s</string>
   <string name="format_username">käyttäjätunnus</string>
@@ -168,9 +166,6 @@
   <string name="delete_message">Oletko varma että haluat poistaa: \'%1$s\'?</string>
   <string name="delete_pos">Kyllä, poista</string>
   <string name="delete_neg">Peru</string>
-  <string name="wizard_agree">Hyväksy</string>
-  <string name="wizard_next">Seuraava</string>
-  <string name="wizard_back">Edellinen</string>
   <string name="terminal_no_hosts_connected">Yhteenkään palvelimeen ei ole yhdistetty</string>
   <string name="terminal_connecting">Muodostetaan %3$s-yhteys palvelimeen %1$s:%2$d</string>
   <string name="terminal_sucess">Varmennettiin palvelin \'%1$s\' avain: %2$s</string>

@@ -65,7 +65,7 @@ public class TerminalBridge implements VDUDisplay {
 	private final static int FONT_SIZE_STEP = 2;
 	private final float displayDensity;
 
-	public Integer[] color;
+	public int[] color;
 
 	public int defaultFg = HostDatabase.DEFAULT_FG_COLOR;
 	public int defaultBg = HostDatabase.DEFAULT_BG_COLOR;
@@ -341,6 +341,33 @@ public class TerminalBridge implements VDUDisplay {
 	}
 
 	/**
+	 * Only intended for pre-Honeycomb devices.
+	 */
+	public void setSelectingForCopy(boolean selectingForCopy) {
+		this.selectingForCopy = selectingForCopy;
+	}
+
+	/**
+	 * Only intended for pre-Honeycomb devices.
+	 */
+	public boolean isSelectingForCopy() {
+		return selectingForCopy;
+	}
+
+	/**
+	 * Only intended for pre-Honeycomb devices.
+	 */
+	public SelectionArea getSelectionArea() {
+		return selectionArea;
+	}
+
+	public void copyCurrentSelection() {
+		if (parent != null) {
+			parent.copyCurrentSelectionToClipboard();
+		}
+	}
+
+	/**
 	 * Inject a specific string into this terminal. Used for post-login strings
 	 * and pasting clipboard.
 	 */
@@ -453,8 +480,7 @@ public class TerminalBridge implements VDUDisplay {
 
 		if (immediate || (host.getQuickDisconnect() && !host.getStayConnected())) {
 			awaitingClose = true;
-			if (disconnectListener != null)
-				disconnectListener.onDisconnected(TerminalBridge.this);
+			triggerDisconnectListener();
 		} else {
 			{
 				final String line = manager.res.getString(R.string.alert_disconnect_msg);
@@ -470,10 +496,7 @@ public class TerminalBridge implements VDUDisplay {
 							manager.res.getString(R.string.prompt_host_disconnected));
 					if (result == null || result.booleanValue()) {
 						awaitingClose = true;
-
-						// Tell the TerminalManager that we can be destroyed now.
-						if (disconnectListener != null)
-							disconnectListener.onDisconnected(TerminalBridge.this);
+						triggerDisconnectListener();
 					}
 				}
 			});
@@ -483,16 +506,23 @@ public class TerminalBridge implements VDUDisplay {
 		}
 	}
 
-	public void setSelectingForCopy(boolean selectingForCopy) {
-		this.selectingForCopy = selectingForCopy;
-	}
-
-	public boolean isSelectingForCopy() {
-		return selectingForCopy;
-	}
-
-	public SelectionArea getSelectionArea() {
-		return selectionArea;
+	/**
+	 * Tells the TerminalManager that we can be destroyed now.
+	 */
+	private void triggerDisconnectListener() {
+		if (disconnectListener != null) {
+			// The disconnect listener should be run on the main thread if possible.
+			if (parent != null) {
+				parent.post(new Runnable() {
+					@Override
+					public void run() {
+						disconnectListener.onDisconnected(TerminalBridge.this);
+					}
+				});
+			} else {
+				disconnectListener.onDisconnected(TerminalBridge.this);
+			}
+		}
 	}
 
 	public synchronized void tryKeyVibrate() {
@@ -534,9 +564,13 @@ public class TerminalBridge implements VDUDisplay {
 		}
 
 		host.setFontSize((int) sizeDp);
-		manager.hostdb.updateFontSize(host);
+		manager.hostdb.saveHost(host);
 
 		forcedSize = false;
+	}
+
+	public float getFontSize() {
+		return fontSizeDp;
 	}
 
 	/**
@@ -951,11 +985,11 @@ public class TerminalBridge implements VDUDisplay {
 	}
 
 	public final void resetColors() {
-		int[] defaults = manager.hostdb.getDefaultColorsForScheme(HostDatabase.DEFAULT_COLOR_SCHEME);
+		int[] defaults = manager.colordb.getDefaultColorsForScheme(HostDatabase.DEFAULT_COLOR_SCHEME);
 		defaultFg = defaults[0];
 		defaultBg = defaults[1];
 
-		color = manager.hostdb.getColorsForScheme(HostDatabase.DEFAULT_COLOR_SCHEME);
+		color = manager.colordb.getColorsForScheme(HostDatabase.DEFAULT_COLOR_SCHEME);
 	}
 
 	private static Pattern urlPattern = null;

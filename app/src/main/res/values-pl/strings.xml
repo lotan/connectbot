@@ -18,12 +18,11 @@
   <string name="help_about">O ConnectBot</string>
   <string name="help_keyboard">Klawiatura</string>
   <string name="pubkey_generate">Wygeneruj</string>
-  <string name="pubkey_import">Importuj</string>
   <string name="pubkey_delete">Usuń klucz</string>
   <string name="pubkey_gather_entropy">Zbieranie danych losowych</string>
   <string name="pubkey_touch_prompt">Dotknij to pole, żeby losowo wygenerować dane. Ukończono: %1$d%%</string>
   <string name="pubkey_touch_hint">Dla niepowtarzalności klucza, poruszaj losowo palcem po polu poniżej.</string>
-  <string name="pubkey_generating">Generowanie pary kluczy...</string>
+  <string name="pubkey_generating">Generowanie pary kluczy…</string>
   <string name="pubkey_copy_private">Kopiuj klucz prywatny</string>
   <string name="pubkey_copy_public">Kopiuj klucz publiczny</string>
   <string name="pubkey_list_empty">Naciśnij \"Menu\", by utworzyć\nlub zaimportować parę kluczy.</string>
@@ -142,7 +141,6 @@
   <string name="portforward_pos">Utwórz przekierowanie portu</string>
   <string name="portforward_done">Pomyślnie utworzono przekierowanie portu</string>
   <string name="portforward_problem">Wystąpił problem podczas tworzenia przekierowania, być może użyłeś portu niższego niż 1024 lub port jest już używany?</string>
-  <string name="portforward_menu_add">Dodaj przekierowanie portu</string>
   <string name="hint_userhost">użytkownik\@host</string>
   <string name="list_format_error">Proszę użyć formatu %1$s</string>
   <string name="format_username">Nazwa użytkownika</string>
@@ -171,9 +169,6 @@
   <string name="delete_message">Jesteś pewien, że chcesz usunąć \'%1$s\'?</string>
   <string name="delete_pos">Tak, usuń</string>
   <string name="delete_neg">Anuluj</string>
-  <string name="wizard_agree">Akceptuj</string>
-  <string name="wizard_next">Dalej</string>
-  <string name="wizard_back">Wróć</string>
   <string name="terminal_no_hosts_connected">Żaden host nie jest obecnie połączony</string>
   <string name="terminal_connecting">Łączenie z hostem %1$s:%2$d przez %3$s</string>
   <string name="terminal_sucess">Host \'%1$s \' zweryfikowany kluczem: %2$s</string>

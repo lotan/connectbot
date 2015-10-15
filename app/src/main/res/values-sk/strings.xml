@@ -17,12 +17,11 @@
   <string name="help_about">O programe ConnectBot</string>
   <string name="help_keyboard">Klávesnica</string>
   <string name="pubkey_generate">Vygenerovať</string>
-  <string name="pubkey_import">Importovať</string>
   <string name="pubkey_delete">Zmazať kľúč</string>
   <string name="pubkey_gather_entropy">Získavanie entropie</string>
   <string name="pubkey_touch_prompt">Dotknite sa plochy pre získanie náhodnosti: %1$d%% hotovo</string>
   <string name="pubkey_touch_hint">Pre zabezpečenie náhodnosti počas generovania kľúča pohybujte prstom náhodne po ploche nižšie.</string>
-  <string name="pubkey_generating">Generujem kľúčový pár...</string>
+  <string name="pubkey_generating">Generujem kľúčový pár…</string>
   <string name="pubkey_copy_private">Kopírovať súkromný kľúč</string>
   <string name="pubkey_copy_public">Kopírovať verejný kľúč</string>
   <string name="pubkey_list_empty">Ťukni na Menu pre vytvorenie\nalebo importovanie páru kľúčov.</string>
@@ -140,7 +139,6 @@
   <string name="portforward_pos">Vytvoriť presmerovanie portu</string>
   <string name="portforward_done">Premerovanie portu úspešne vytvorené</string>
   <string name="portforward_problem">Problém s vytvorením presmerovania portu, možno používate port menší ako 1024 alebo je už obsadený?</string>
-  <string name="portforward_menu_add">Pridať presmerovanie portu</string>
   <string name="hint_userhost">používateľské_meno\@hostiteľ</string>
   <string name="list_format_error">Použite formát \"%1$s\"</string>
   <string name="format_username">užívateľské meno</string>
@@ -169,9 +167,6 @@
   <string name="delete_message">Naozaj chcete zmazať \'%1$s\'?</string>
   <string name="delete_pos">Áno, vymazať</string>
   <string name="delete_neg">Zrušiť</string>
-  <string name="wizard_agree">Súhlasím</string>
-  <string name="wizard_next">Ďalej</string>
-  <string name="wizard_back">Späť</string>
   <string name="terminal_no_hosts_connected">Žiadny hostiteľ nie je pripijený</string>
   <string name="terminal_connecting">Pripájanie k %1$s:%2$d cez %3$s</string>
   <string name="terminal_sucess">Hostiteľ overený \'%1$s\' kľúč: %2$s</string>

@@ -25,10 +25,16 @@ import org.connectbot.bean.SelectionArea;
 import org.connectbot.service.FontSizeChangedListener;
 import org.connectbot.service.TerminalBridge;
 import org.connectbot.service.TerminalKeyListener;
+import org.connectbot.util.PreferenceConstants;
+import org.connectbot.util.TerminalTextViewOverlay;
+import org.connectbot.util.TerminalViewPager;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Canvas;
@@ -39,19 +45,24 @@ import android.graphics.PixelXorXfermode;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v4.view.MotionEventCompat;
-import android.view.InputDevice;
+import android.os.Build;
+import android.preference.PreferenceManager;
+import android.text.ClipboardManager;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
+import android.view.ViewConfiguration;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import de.mud.terminal.VDUBuffer;
+import de.mud.terminal.vt320;
 
 /**
  * User interface {@link View} for showing a TerminalBridge in an
@@ -60,10 +71,19 @@ import de.mud.terminal.VDUBuffer;
  *
  * @author jsharkey
  */
-public class TerminalView extends View implements FontSizeChangedListener {
-
+public class TerminalView extends FrameLayout implements FontSizeChangedListener {
 	private final Context context;
 	public final TerminalBridge bridge;
+
+	private TerminalTextViewOverlay terminalTextViewOverlay;
+	public final TerminalViewPager viewPager;
+	private GestureDetector gestureDetector;
+	private SharedPreferences prefs;
+
+	// These are only used for pre-Honeycomb copying.
+	private int lastTouchedRow, lastTouchedCol;
+	private final ClipboardManager clipboard;
+
 	private final Paint paint;
 	private final Paint cursorPaint;
 	private final Paint cursorStrokePaint;
@@ -94,16 +114,28 @@ public class TerminalView extends View implements FontSizeChangedListener {
 	private static final String SCREENREADER_INTENT_ACTION = "android.accessibilityservice.AccessibilityService";
 	private static final String SCREENREADER_INTENT_CATEGORY = "android.accessibilityservice.category.FEEDBACK_SPOKEN";
 
-	public TerminalView(Context context, TerminalBridge bridge) {
+	public TerminalView(Context context, TerminalBridge bridge, TerminalViewPager pager) {
 		super(context);
+
+		setWillNotDraw(false);
 
 		this.context = context;
 		this.bridge = bridge;
-		paint = new Paint();
+		this.viewPager = pager;
 
 		setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		setFocusable(true);
 		setFocusableInTouchMode(true);
+
+		// Some things TerminalView uses is unsupported in hardware acceleration
+		// so this is using software rendering until we can replace all the
+		// instances.
+		// See: https://developer.android.com/guide/topics/graphics/hardware-accel.html#unsupported
+		if (Build.VERSION.SDK_INT >= 11) {
+			setLayerTypeToSoftware();
+		}
+
+		paint = new Paint();
 
 		cursorPaint = new Paint();
 		cursorPaint.setColor(bridge.color[bridge.defaultFg]);
@@ -140,14 +172,191 @@ public class TerminalView extends View implements FontSizeChangedListener {
 		scaleMatrix = new Matrix();
 
 		bridge.addFontSizeChangedListener(this);
+		bridge.parentChanged(this);
 
 		// connect our view up to the bridge
 		setOnKeyListener(bridge.getKeyHandler());
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			terminalTextViewOverlay = new TerminalTextViewOverlay(context, this);
+			terminalTextViewOverlay.setLayoutParams(
+					new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+			addView(terminalTextViewOverlay, 0);
+
+			// Once terminalTextViewOverlay is active, allow it to handle key events instead.
+			terminalTextViewOverlay.setOnKeyListener(bridge.getKeyHandler());
+		}
 
 		mAccessibilityBuffer = new StringBuffer();
 
 		// Enable accessibility features if a screen reader is active.
 		new AccessibilityStateTester().execute((Void) null);
+
+		clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+		prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		onFontSizeChanged(bridge.getFontSize());
+
+		gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+			// Only used for pre-Honeycomb devices.
+			private TerminalBridge bridge = TerminalView.this.bridge;
+			private float totalY = 0;
+
+			@Override
+			public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+				// The terminalTextViewOverlay handles scrolling. Only handle scrolling if it
+				// is not available (i.e. on pre-Honeycomb devices).
+				if (terminalTextViewOverlay != null) {
+					return false;
+				}
+
+				// activate consider if within x tolerance
+				int touchSlop =
+						ViewConfiguration.get(TerminalView.this.context).getScaledTouchSlop();
+				if (Math.abs(e1.getX() - e2.getX()) < touchSlop * 4) {
+					// estimate how many rows we have scrolled through
+					// accumulate distance that doesn't trigger immediate scroll
+					totalY += distanceY;
+					final int moved = (int) (totalY / bridge.charHeight);
+
+					// Consume as pg up/dn only if towards left third of screen with the gesture
+					// enabled.
+					boolean pgUpDnGestureEnabled =
+							prefs.getBoolean(PreferenceConstants.PG_UPDN_GESTURE, false);
+					if (e2.getX() <= getWidth() / 3 && pgUpDnGestureEnabled) {
+						// otherwise consume as pgup/pgdown for every 5 lines
+						if (moved > 5) {
+							((vt320) bridge.buffer).keyPressed(vt320.KEY_PAGE_DOWN, ' ', 0);
+							bridge.tryKeyVibrate();
+							totalY = 0;
+						} else if (moved < -5) {
+							((vt320) bridge.buffer).keyPressed(vt320.KEY_PAGE_UP, ' ', 0);
+							bridge.tryKeyVibrate();
+							totalY = 0;
+						}
+					} else if (moved != 0) {
+						int base = bridge.buffer.getWindowBase();
+						bridge.buffer.setWindowBase(base + moved);
+						totalY = 0;
+					}
+				}
+
+				return true;
+			}
+
+			@Override
+			public boolean onSingleTapConfirmed(MotionEvent e) {
+				viewPager.performClick();
+				return super.onSingleTapConfirmed(e);
+			}
+		});
+	}
+
+	@TargetApi(11)
+	private void setLayerTypeToSoftware() {
+		setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+	}
+
+	public void copyCurrentSelectionToClipboard() {
+		if (terminalTextViewOverlay != null) {
+			terminalTextViewOverlay.copyCurrentSelectionToClipboard();
+		}
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		if (gestureDetector != null) {
+			gestureDetector.onTouchEvent(event);
+		}
+
+		// Old version of copying, only for pre-Honeycomb.
+		if (terminalTextViewOverlay == null) {
+			// when copying, highlight the area
+			if (bridge.isSelectingForCopy()) {
+				SelectionArea area = bridge.getSelectionArea();
+				int row = (int) Math.floor(event.getY() / bridge.charHeight);
+				int col = (int) Math.floor(event.getX() / bridge.charWidth);
+
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					// recording starting area
+					viewPager.setPagingEnabled(false);
+					if (area.isSelectingOrigin()) {
+						area.setRow(row);
+						area.setColumn(col);
+						lastTouchedRow = row;
+						lastTouchedCol = col;
+						bridge.redraw();
+					}
+					return true;
+				case MotionEvent.ACTION_MOVE:
+							/* ignore when user hasn't moved since last time so
+							 * we can fine-tune with directional pad
+							 */
+					if (row == lastTouchedRow && col == lastTouchedCol)
+						return true;
+
+					// if the user moves, start the selection for other corner
+					area.finishSelectingOrigin();
+
+					// update selected area
+					area.setRow(row);
+					area.setColumn(col);
+					lastTouchedRow = row;
+					lastTouchedCol = col;
+					bridge.redraw();
+					return true;
+				case MotionEvent.ACTION_UP:
+							/* If they didn't move their finger, maybe they meant to
+							 * select the rest of the text with the directional pad.
+							 */
+					if (area.getLeft() == area.getRight() &&
+							area.getTop() == area.getBottom()) {
+						return true;
+					}
+
+					// copy selected area to clipboard
+					String copiedText = area.copyFrom(bridge.buffer);
+
+					clipboard.setText(copiedText);
+					Toast.makeText(
+						context,
+						context.getString(R.string.console_copy_done, copiedText.length()),
+						Toast.LENGTH_LONG).show();
+
+					// fall through to clear state
+
+				case MotionEvent.ACTION_CANCEL:
+					// make sure we clear any highlighted area
+					area.reset();
+					bridge.setSelectingForCopy(false);
+					bridge.redraw();
+					viewPager.setPagingEnabled(true);
+					return true;
+				}
+			}
+
+			return true;
+		}
+
+		super.onTouchEvent(event);
+
+		return true;
+	}
+
+	/**
+	 * Only intended for pre-Honeycomb devices.
+	 */
+	public void startPreHoneycombCopyMode() {
+		// mark as copying and reset any previous bounds
+		SelectionArea area = bridge.getSelectionArea();
+		area.reset();
+		area.setBounds(bridge.buffer.getColumns(), bridge.buffer.getRows());
+
+		bridge.setSelectingForCopy(true);
+
+		// Make sure we show the initial selection
+		bridge.redraw();
 	}
 
 	public void destroy() {
@@ -164,8 +373,23 @@ public class TerminalView extends View implements FontSizeChangedListener {
 		scaleCursors();
 	}
 
-	public void onFontSizeChanged(float size) {
+	public void onFontSizeChanged(final float size) {
 		scaleCursors();
+
+		((Activity) context).runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (terminalTextViewOverlay != null) {
+					terminalTextViewOverlay.setTextSize(size);
+
+					// For the TextView to line up with the bitmap text, lineHeight must be equal to
+					// the bridge's charHeight. See TextView.getLineHeight(), which has been reversed to
+					// derive lineSpacingMultiplier.
+					float lineSpacingMultiplier = (float) bridge.charHeight / terminalTextViewOverlay.getPaint().getFontMetricsInt(null);
+					terminalTextViewOverlay.setLineSpacing(0.0f, lineSpacingMultiplier);
+				}
+			}
+		});
 	}
 
 	private void scaleCursors() {
@@ -244,7 +468,7 @@ public class TerminalView extends View implements FontSizeChangedListener {
 			}
 
 			// draw any highlighted area
-			if (bridge.isSelectingForCopy()) {
+			if (terminalTextViewOverlay == null && bridge.isSelectingForCopy()) {
 				SelectionArea area = bridge.getSelectionArea();
 				canvas.save(Canvas.CLIP_SAVE_FLAG);
 				canvas.clipRect(
@@ -322,23 +546,6 @@ public class TerminalView extends View implements FontSizeChangedListener {
 		};
 	}
 
-	@Override
-	public boolean onGenericMotionEvent(MotionEvent event) {
-		if ((MotionEventCompat.getSource(event) & InputDevice.SOURCE_CLASS_POINTER) != 0) {
-			switch (event.getAction()) {
-			case MotionEvent.ACTION_SCROLL:
-				// Process scroll wheel movement:
-				float yDistance = MotionEventCompat.getAxisValue(event, MotionEvent.AXIS_VSCROLL);
-				if (yDistance != 0) {
-					int base = bridge.buffer.getWindowBase();
-					bridge.buffer.setWindowBase(base - Math.round(yDistance));
-					return true;
-				}
-			}
-		}
-		return super.onGenericMotionEvent(event);
-	}
-
 	public void propagateConsoleText(char[] rawText, int length) {
 		if (mAccessibilityActive) {
 			synchronized (mAccessibilityLock) {
@@ -355,6 +562,15 @@ public class TerminalView extends View implements FontSizeChangedListener {
 				postDelayed(mEventSender, ACCESSIBILITY_EVENT_THRESHOLD);
 			}
 		}
+
+		((Activity) context).runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (terminalTextViewOverlay != null) {
+					terminalTextViewOverlay.onBufferChanged();
+				}
+			}
+		});
 	}
 
 	private class AccessibilityEventSender implements Runnable {

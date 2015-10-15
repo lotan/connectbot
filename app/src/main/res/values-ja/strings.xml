@@ -18,12 +18,11 @@
   <string name="help_about">ConnectBotについて</string>
   <string name="help_keyboard">キーボード</string>
   <string name="pubkey_generate">生成</string>
-  <string name="pubkey_import">インポート</string>
   <string name="pubkey_delete">鍵を削除</string>
   <string name="pubkey_gather_entropy">エントロピー収集中</string>
   <string name="pubkey_touch_prompt">この四角内をランダムに触ってください: %1$d%% 完了</string>
   <string name="pubkey_touch_hint">鍵作成時のランダムさを保証するため、下の四角内で指をランダムに動かしてください。</string>
-  <string name="pubkey_generating">鍵ペアを生成しています...</string>
+  <string name="pubkey_generating">鍵ペアを生成しています……</string>
   <string name="pubkey_copy_private">秘密鍵をコピー</string>
   <string name="pubkey_copy_public">公開鍵をコピー</string>
   <string name="pubkey_list_empty">Menuボタンを押して鍵の作成またはインポートを行ってください。</string>
@@ -155,7 +154,6 @@
   <string name="portforward_pos">ポート転送の作成</string>
   <string name="portforward_done">ポート転送の作成に成功しました．</string>
   <string name="portforward_problem">ポート転送の作成ができません．おそらく1024ポート以下か既に利用されているポートを指定されています．</string>
-  <string name="portforward_menu_add">ポート転送の追加</string>
   <string name="hint_userhost">ユーザ\@ホスト名</string>
   <string name="list_format_error">%1$s 形式を使ってください</string>
   <string name="format_username">ユーザ名</string>
@@ -184,9 +182,6 @@
   <string name="delete_message">\'%1$s\'を削除してよろしいですか?</string>
   <string name="delete_pos">はい、削除します</string>
   <string name="delete_neg">キャンセル</string>
-  <string name="wizard_agree">同意します</string>
-  <string name="wizard_next">次へ</string>
-  <string name="wizard_back">戻る</string>
   <string name="terminal_no_hosts_connected">接続済みのホストはありません．</string>
   <string name="terminal_connecting">%1$s:%2$dに%3$sで接続しています</string>
   <string name="terminal_sucess">ホスト\'%1$s\' キー%2$s を検証しました</string>
@@ -194,6 +189,7 @@
   <string name="terminal_using_s2c_algorithm">サーバtoクライアント アルゴリズム: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">クライアントからサーバ アルゴリズム: %1$s %2$s</string>
   <string name="terminal_using_algorithm">使用アルゴリズム: %1$s %2$s</string>
+  <string name="terminal_kex_algorithm">鍵交換アルゴリズム： %s</string>
   <string name="terminal_auth">認証を試行中</string>
   <string name="terminal_auth_pass">\'password\' 認証を試行</string>
   <string name="terminal_auth_pass_fail">\'password\' 認証失敗</string>

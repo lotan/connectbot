@@ -22,6 +22,7 @@ import java.lang.ref.WeakReference;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,6 +37,8 @@ import java.util.concurrent.TimeUnit;
 import org.connectbot.R;
 import org.connectbot.bean.HostBean;
 import org.connectbot.bean.PubkeyBean;
+import org.connectbot.data.ColorStorage;
+import org.connectbot.data.HostStorage;
 import org.connectbot.transport.TransportFactory;
 import org.connectbot.util.HostDatabase;
 import org.connectbot.util.PreferenceConstants;
@@ -55,9 +58,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -72,7 +73,7 @@ import android.util.Log;
 public class TerminalManager extends Service implements BridgeDisconnectedListener, OnSharedPreferenceChangeListener {
 	public final static String TAG = "CB.TerminalManager";
 
-	private List<TerminalBridge> bridges = new LinkedList<TerminalBridge>();
+	private ArrayList<TerminalBridge> bridges = new ArrayList<TerminalBridge>();
 	public Map<HostBean, WeakReference<TerminalBridge>> mHostBridgeMap =
 		new HashMap<HostBean, WeakReference<TerminalBridge>>();
 	public Map<String, WeakReference<TerminalBridge>> mNicknameBridgeMap =
@@ -82,13 +83,16 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 
 	public List<HostBean> disconnected = new LinkedList<HostBean>();
 
-	public Handler disconnectHandler = null;
+	public BridgeDisconnectedListener disconnectListener = null;
+
+	private final ArrayList<OnHostStatusChangedListener> hostStatusChangedListeners = new ArrayList<>();
 
 	public Map<String, KeyHolder> loadedKeypairs = new HashMap<String, KeyHolder>();
 
 	public Resources res;
 
-	public HostDatabase hostdb;
+	public HostStorage hostdb;
+	public ColorStorage colordb;
 	public PubkeyDatabase pubkeydb;
 
 	protected SharedPreferences prefs;
@@ -139,6 +143,7 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 				}}, RECONNECT_DELAY, RECONNECT_DELAY, TimeUnit.MILLISECONDS);
 
 		hostdb = new HostDatabase(this);
+		colordb = HostDatabase.get(this);
 		pubkeydb = new PubkeyDatabase(this);
 
 		// load all marked pubkeys into memory
@@ -182,15 +187,8 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 
 		disconnectAll(true, false);
 
-		if (hostdb != null) {
-			hostdb.close();
-			hostdb = null;
-		}
-
-		if (pubkeydb != null) {
-			pubkeydb.close();
-			pubkeydb = null;
-		}
+		hostdb = null;
+		pubkeydb = null;
 
 		synchronized (this) {
 			if (idleTimer != null)
@@ -211,7 +209,7 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 	/**
 	 * Disconnect all currently connected bridges.
 	 */
-	private void disconnectAll(final boolean immediate, final boolean excludeLocal) {
+	public void disconnectAll(final boolean immediate, final boolean excludeLocal) {
 		TerminalBridge[] tmpBridges = null;
 
 		synchronized (bridges) {
@@ -265,11 +263,13 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 		// also update database with new connected time
 		touchHost(host);
 
+		notifyHostStatusChanged();
+
 		return bridge;
 	}
 
 	public String getEmulation() {
-		return prefs.getString(PreferenceConstants.EMULATION, "screen");
+		return prefs.getString(PreferenceConstants.EMULATION, "xterm-256color");
 	}
 
 	public int getScrollback() {
@@ -340,6 +340,7 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 	 */
 	public void onDisconnected(TerminalBridge bridge) {
 		boolean shouldHideRunningNotification = false;
+		Log.d(TAG, "Bridge Disconnected. Removing it.");
 
 		synchronized (bridges) {
 			// remove this bridge from our list
@@ -355,19 +356,21 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 			if (bridges.size() == 0) {
 				shouldHideRunningNotification = true;
 			}
+
+			// pass notification back up to gui
+			if (disconnectListener != null)
+				disconnectListener.onDisconnected(bridge);
 		}
 
 		synchronized (disconnected) {
 			disconnected.add(bridge.host);
 		}
 
+		notifyHostStatusChanged();
+
 		if (shouldHideRunningNotification) {
 			ConnectionNotifier.getInstance().hideRunningNotification(this);
 		}
-
-		// pass notification back up to gui
-		if (disconnectHandler != null)
-			Message.obtain(disconnectHandler, -1, bridge).sendToTarget();
 	}
 
 	public boolean isKeyLoaded(String nickname) {
@@ -482,7 +485,7 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 		}
 	}
 
-	public List<TerminalBridge> getBridges() {
+	public ArrayList<TerminalBridge> getBridges() {
 		return bridges;
 	}
 

@@ -299,6 +299,37 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 					return true;
 			}
 
+			// CTRL-SHIFT-C to copy.
+			if (keyCode == KeyEvent.KEYCODE_C
+					&& (derivedMetaState & HC_META_CTRL_ON) != 0
+					&& (derivedMetaState & KeyEvent.META_SHIFT_ON) != 0) {
+				bridge.copyCurrentSelection();
+				return true;
+			}
+
+			// CTRL-SHIFT-V to paste.
+			if (keyCode == KeyEvent.KEYCODE_V
+					&& (derivedMetaState & HC_META_CTRL_ON) != 0
+					&& (derivedMetaState & KeyEvent.META_SHIFT_ON) != 0
+					&& clipboard.hasText()) {
+				bridge.injectString(clipboard.getText().toString());
+				return true;
+			}
+
+			if ((keyCode == KeyEvent.KEYCODE_EQUALS
+					&& (derivedMetaState & HC_META_CTRL_ON) != 0
+					&& (derivedMetaState & KeyEvent.META_SHIFT_ON) != 0)
+					|| (keyCode == KeyEvent.KEYCODE_PLUS
+					&& (derivedMetaState & HC_META_CTRL_ON) != 0)) {
+				bridge.increaseFontSize();
+				return true;
+			}
+
+			if (keyCode == KeyEvent.KEYCODE_MINUS && (derivedMetaState & HC_META_CTRL_ON) != 0) {
+				bridge.decreaseFontSize();
+				return true;
+			}
+
 			// Ask the system to use the keymap to give us the unicode character for this key,
 			// with our derived modifier state applied.
 			int uchar = event.getUnicodeChar(derivedMetaState & ~HC_META_CTRL_MASK);
@@ -342,7 +373,7 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 			}
 
 			// look for special chars
-			switch(keyCode) {
+			switch (keyCode) {
 			case KEYCODE_ESCAPE:
 				sendEscape();
 				return true;
@@ -495,6 +526,10 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 				bridge.dispatchDisconnect(false);
 			}
 		}
+	}
+
+	public void sendPressedKey(int key) {
+		((vt320) buffer).keyPressed(key, ' ', getStateForBuffer());
 	}
 
 	/**

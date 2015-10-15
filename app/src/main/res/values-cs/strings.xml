@@ -17,12 +17,11 @@
   <string name="help_about">O aplikaci ConnectBot</string>
   <string name="help_keyboard">Klávesnice</string>
   <string name="pubkey_generate">Vygenerovat</string>
-  <string name="pubkey_import">Importovat</string>
   <string name="pubkey_delete">Smazat klíč</string>
   <string name="pubkey_gather_entropy">Získávání entropie</string>
   <string name="pubkey_touch_prompt">Dotkněte se plochy pro získání náhodnosti: %1$d%% hotovo</string>
   <string name="pubkey_touch_hint">Pro zajištění náhodnosti během generování klíče pohybujte prstem náhodně po ploše níže.</string>
-  <string name="pubkey_generating">Generování páru klíčů..</string>
+  <string name="pubkey_generating">Generování páru klíčů…</string>
   <string name="pubkey_copy_private">Kopírovat soukromý klíč</string>
   <string name="pubkey_copy_public">Kopírovat veřejný klíč</string>
   <string name="pubkey_list_empty">Zvolte \"Menu\" pro vytvoření\nnebo import párů klíčů.</string>
@@ -137,7 +136,6 @@
   <string name="portforward_dynamic">Dynamický (SOCKS)</string>
   <string name="portforward_pos">Vytvořit přesměrování portu</string>
   <string name="portforward_done">Přesměrování portu úspěšně vytvořeno</string>
-  <string name="portforward_menu_add">Přidat přesměrování portu</string>
   <string name="hint_userhost">user\@hostname</string>
   <string name="list_format_error">Použijte formát %1$s</string>
   <string name="format_username">uživatelské jméno</string>
@@ -166,9 +164,6 @@
   <string name="delete_message">Určitě chcete smazat \'%1$s\'?</string>
   <string name="delete_pos">Ano, smazat</string>
   <string name="delete_neg">Zrušit</string>
-  <string name="wizard_agree">Souhlasím</string>
-  <string name="wizard_next">Další</string>
-  <string name="wizard_back">Zpět</string>
   <string name="terminal_no_hosts_connected">Žádný host není připojený</string>
   <string name="terminal_connecting">Připojování k %1$s:%2$d přes %3$s</string>
   <string name="terminal_failed">Selhalo ověření klíče hosta</string>

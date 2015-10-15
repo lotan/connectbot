@@ -46,6 +46,7 @@ public class PreferenceConstants {
 
 	public static final String FULLSCREEN = "fullscreen";
 	public static final String TITLEBARHIDE = "titlebarhide";
+	public static final String PG_UPDN_GESTURE = "pgupdngesture";
 
 	public static final String KEYMODE = "keymode";
 
@@ -65,8 +66,6 @@ public class PreferenceConstants {
 	public static final String WIFI_LOCK = "wifilock";
 
 	public static final String BUMPY_ARROWS = "bumpyarrows";
-
-	public static final String EULA = "eula";
 
 	public static final String SORT_BY_COLOR = "sortByColor";
 

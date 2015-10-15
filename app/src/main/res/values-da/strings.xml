@@ -17,12 +17,11 @@
   <string name="help_about">Om ConnectBot</string>
   <string name="help_keyboard">Tastatur</string>
   <string name="pubkey_generate">Opret</string>
-  <string name="pubkey_import">Importér</string>
   <string name="pubkey_delete">Slet nøgle</string>
   <string name="pubkey_gather_entropy">Indsamler entropi</string>
   <string name="pubkey_touch_prompt">Berør denne boks for at generere tilfældighed: %1$d%% færdig</string>
   <string name="pubkey_touch_hint">For at garantere tilfældig data til oprettelse af nøglen, skal du flytte din finger tilfældigt indenfor boksen nedenfor.</string>
-  <string name="pubkey_generating">Opretter nøglepar...</string>
+  <string name="pubkey_generating">Opretter nøglepar…</string>
   <string name="pubkey_copy_private">Kopier privat nøgle</string>
   <string name="pubkey_copy_public">Kopier offentlig nøgle</string>
   <string name="pubkey_list_empty">Tryk Menu for at oprette\nog importere nøglepar.</string>
@@ -39,7 +38,7 @@
   <string name="portforward_list_empty">Tryk Menu for at oprette\nport-videresendelser.</string>
   <string name="portforward_edit">Rediger port-videresendelse</string>
   <string name="portforward_delete">Slet port-videresendelse</string>
-  <string name="prompt_nickname">Kaldenavn:</string>
+  <string name="prompt_nickname">Navn:</string>
   <string name="prompt_nickname_hint_pubkey">Min arbejdsnøgle</string>
   <string name="prompt_source_port">Kildeport:</string>
   <string name="prompt_destination">Destination:</string>
@@ -102,7 +101,7 @@
   <string name="list_keymode_none">Slå fra</string>
   <string name="list_pubkeyids_none">Brug ikke tasterne</string>
   <string name="list_pubkeyids_any">Anvend enhver ulåst nøgle</string>
-  <string name="hostpref_nickname_title">Kaldenavn</string>
+  <string name="hostpref_nickname_title">Navn</string>
   <string name="hostpref_color_title">Farvekategori</string>
   <string name="hostpref_fontsize_title">Skriftstørrelse (pt)</string>
   <string name="hostpref_pubkeyid_title">Brug offentlig nøgleautorisering</string>
@@ -140,7 +139,6 @@
   <string name="portforward_pos">Opret port-videresendelse</string>
   <string name="portforward_done">Port-videresendelse oprettet</string>
   <string name="portforward_problem">Der opstod problemer ved oprettelsen af port-videresendelse. Måske bruger du en port lavere end 1025, eller en port som allerede er i brug.</string>
-  <string name="portforward_menu_add">Tilføj port-videresendelse</string>
   <string name="hint_userhost">brugernavn\@vært</string>
   <string name="list_format_error">Anvend formatet %1$s</string>
   <string name="format_username">brugernavn</string>
@@ -169,9 +167,6 @@
   <string name="delete_message">Er du sikker på at du vil slette \'%1$s\'?</string>
   <string name="delete_pos">Ja, slet</string>
   <string name="delete_neg">Afbryd</string>
-  <string name="wizard_agree">Godkend</string>
-  <string name="wizard_next">Næste</string>
-  <string name="wizard_back">Tilbage</string>
   <string name="terminal_no_hosts_connected">Ingen forbindelser aktive i øjeblikket</string>
   <string name="terminal_connecting">Forbinder til %1$s:%2$d via %3$s</string>
   <string name="terminal_sucess">Verificeret vært \'%1$s\' nøgle: %2$s</string>

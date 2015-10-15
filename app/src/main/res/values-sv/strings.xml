@@ -17,12 +17,11 @@
   <string name="help_about">Om ConnectBot</string>
   <string name="help_keyboard">Tangentbord</string>
   <string name="pubkey_generate">Generera</string>
-  <string name="pubkey_import">Importera</string>
   <string name="pubkey_delete">Ta bort nyckel</string>
   <string name="pubkey_gather_entropy">Samlar in entropi</string>
   <string name="pubkey_touch_prompt">Rör vid rutan för att samla in slumpdata: %1$d%% klart</string>
   <string name="pubkey_touch_hint">För att försäkra dig om att nyckeln som skapas är slumpmässig, rör fingret slumpmässigt över skärmen.</string>
-  <string name="pubkey_generating">Genererar nyckelpar...</string>
+  <string name="pubkey_generating">Genererar nyckelpar…</string>
   <string name="pubkey_copy_private">Kopiera privat nyckel</string>
   <string name="pubkey_copy_public">Kopiera publik nyckel</string>
   <string name="pubkey_list_empty">Tryck på Meny för att\nskapa eller importera nyckelpar</string>
@@ -140,7 +139,6 @@
   <string name="portforward_pos">Skapa vidarebefodring av port</string>
   <string name="portforward_done">Vidarebefodring av port skapad.</string>
   <string name="portforward_problem">Lyckades inte att skapa en vidarebefodring av port, är den under 1024 eller används den kanske?</string>
-  <string name="portforward_menu_add">Lägg till vidarebefodring av port.</string>
   <string name="hint_userhost">användarnamn\@värdnamn</string>
   <string name="list_format_error">Använd formatet %1$s</string>
   <string name="format_username">användarnamn</string>
@@ -169,9 +167,6 @@
   <string name="delete_message">Är du säker att du vill ta bort \'%1$s\'?</string>
   <string name="delete_pos">Ja, ta bort</string>
   <string name="delete_neg">Avbryt</string>
-  <string name="wizard_agree">Godkänn</string>
-  <string name="wizard_next">Nästa</string>
-  <string name="wizard_back">Tillbaka</string>
   <string name="terminal_no_hosts_connected">Inga värdar anslutna</string>
   <string name="terminal_connecting">Ansluter till %1$s:%2$d via %3$s</string>
   <string name="terminal_sucess">Verifierad värd \'%1$s\' nyckel: %2$s</string>
