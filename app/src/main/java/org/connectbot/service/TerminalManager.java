@@ -142,9 +142,9 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 					TerminalManager.this.reconnectPending();
 				}}, RECONNECT_DELAY, RECONNECT_DELAY, TimeUnit.MILLISECONDS);
 
-		hostdb = new HostDatabase(this);
+		hostdb = HostDatabase.get(this);
 		colordb = HostDatabase.get(this);
-		pubkeydb = new PubkeyDatabase(this);
+		pubkeydb = PubkeyDatabase.get(this);
 
 		// load all marked pubkeys into memory
 		updateSavingKeys();
