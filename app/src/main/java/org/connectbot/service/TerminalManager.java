@@ -55,7 +55,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
@@ -571,10 +570,10 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 				PreferenceConstants.DEFAULT_BELL_VOLUME);
 
 		mediaPlayer.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
-		mediaPlayer.setOnCompletionListener(new BeepListener());
 
 		AssetFileDescriptor file = res.openRawResourceFd(R.raw.bell);
 		try {
+			mediaPlayer.setLooping(false);
 			mediaPlayer.setDataSource(file.getFileDescriptor(), file
 					.getStartOffset(), file.getLength());
 			file.close();
@@ -593,17 +592,13 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 	}
 
 	public void playBeep() {
-		if (mediaPlayer != null)
+		if (mediaPlayer != null) {
+			mediaPlayer.seekTo(0);
 			mediaPlayer.start();
+		}
 
 		if (wantBellVibration)
 			vibrate();
-	}
-
-	private static class BeepListener implements OnCompletionListener {
-		public void onCompletion(MediaPlayer mp) {
-			mp.seekTo(0);
-		}
 	}
 
 	/**
