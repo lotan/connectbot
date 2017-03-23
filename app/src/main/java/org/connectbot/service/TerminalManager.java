@@ -115,9 +115,6 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 
 	private boolean savingKeys;
 
-	protected List<WeakReference<TerminalBridge>> mPendingReconnect
-			= new LinkedList<WeakReference<TerminalBridge>>();
-
 	public boolean hardKeyboardHidden;
 
 	@Override
@@ -338,7 +335,7 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 				connectivityManager.decRef();
 			}
 
-			if (bridges.isEmpty() && mPendingReconnect.isEmpty()) {
+			if (bridges.isEmpty()) {
 				shouldHideRunningNotification = true;
 			}
 
@@ -692,36 +689,25 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 	}
 
 	/**
-	 * Insert request into reconnect queue to be executed either immediately
-	 * or later when connectivity is restored depending on whether we're
-	 * currently connected.
+	 * If network is connected, attempt reconnect immediately.
 	 *
 	 * @param bridge the TerminalBridge to reconnect when possible
 	 */
 	public void requestReconnect(TerminalBridge bridge) {
-		synchronized (mPendingReconnect) {
-			mPendingReconnect.add(new WeakReference<TerminalBridge>(bridge));
-			if (!bridge.isUsingNetwork() ||
-					connectivityManager.isConnected()) {
-				reconnectPending();
-			}
+
+		if (!bridge.isUsingNetwork() ||
+				connectivityManager.isConnected()) {
+			bridge.startConnection();
 		}
 	}
 
 	/**
-	 * Reconnect all bridges that were pending a reconnect when connectivity
-	 * was lost.
+	 * Reconnect all bridges that are disconnected but flagged to stay connected.
 	 */
 	private void reconnectPending() {
-		synchronized (mPendingReconnect) {
-			for (WeakReference<TerminalBridge> ref : mPendingReconnect) {
-				TerminalBridge bridge = ref.get();
-				if (bridge == null) {
-					continue;
-				}
+		for (TerminalBridge bridge : bridges) {
+			if (!bridge.isConnected() && bridge.isStayConnected())
 				bridge.startConnection();
-			}
-			mPendingReconnect.clear();
 		}
 	}
 
