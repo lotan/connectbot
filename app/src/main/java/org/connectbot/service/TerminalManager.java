@@ -723,7 +723,7 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 	/**
 	 * Reconnect all bridges that are checked "stay connected"
 	 */
-	private void reconnectPending() {
+	public void reconnectPending() {
 		for (TerminalBridge bridge : bridges) {
 			if (bridge.isStayConnected()) {
 				requestReconnect(bridge);
