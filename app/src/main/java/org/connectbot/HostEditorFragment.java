@@ -60,7 +60,7 @@ public class HostEditorFragment extends Fragment {
 
 	// Note: The "max" value for mFontSizeSeekBar is 32. If these font values change, this value
 	// must be changed in the SeekBar's XML.
-	private static final int MINIMUM_FONT_SIZE = 8;
+	private static final int MINIMUM_FONT_SIZE = 6;
 	private static final int MAXIMUM_FONT_SIZE = 40;
 
 	// The host being edited.
