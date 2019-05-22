@@ -46,6 +46,8 @@ public class ConnectivityReceiver extends BroadcastReceiver {
 
 	private Object[] mLock = new Object[0];
 
+	private int lastNetworkType = 0;
+
 	public ConnectivityReceiver(TerminalManager manager, boolean lockingWifi) {
 		mTerminalManager = manager;
 
@@ -81,8 +83,9 @@ public class ConnectivityReceiver extends BroadcastReceiver {
 
 		boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
 		boolean isFailover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
+		int networkType = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, ConnectivityManager.TYPE_MOBILE);
 
-		Log.d(TAG, "onReceived() called; noConnectivity? " + noConnectivity + "; isFailover? " + isFailover);
+		Log.d(TAG, "onReceived() called; noConnectivity? " + noConnectivity + "; isFailover? " + isFailover + "; lastNetworkType: " + lastNetworkType + "; networkType: " + networkType);
 
 		if (noConnectivity && !isFailover && mIsConnected) {
 			mIsConnected = false;
@@ -95,7 +98,21 @@ public class ConnectivityReceiver extends BroadcastReceiver {
 			if (mIsConnected) {
 				mTerminalManager.onConnectivityRestored();
 			}
+		// issue a reconnect if the network type changes from mobile to WIFI
+		} else if (lastNetworkType == ConnectivityManager.TYPE_MOBILE && networkType == ConnectivityManager.TYPE_WIFI) {
+			Log.d(TAG, "lastNetworkType == ConnectivityManager.TYPE_MOBILE && networkType == ConnectivityManager.TYPE_WIFI");
+			new Thread() {
+				@Override
+				public void run() {
+					Log.d(TAG, "disconnect/reconnect");
+					mTerminalManager.disconnectAll(false, true);
+					mTerminalManager.reconnectPending();
+				}
+			}.start();
 		}
+
+		// remember network type of the last change to the connection
+		lastNetworkType = networkType;
 	}
 
 	/**
