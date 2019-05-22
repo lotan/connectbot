@@ -125,6 +125,8 @@ public class TerminalBridge implements VDUDisplay {
 
 	private BridgeDisconnectedListener disconnectListener = null;
 
+	private boolean isConnecting = false;
+
 	/**
 	 * Create a new terminal bridge suitable for unit testing.
 	 */
@@ -263,6 +265,7 @@ public class TerminalBridge implements VDUDisplay {
 	 * Spawn thread to open connection and start login process.
 	 */
 	protected void startConnection() {
+		isConnecting = true;
 		transport = TransportFactory.getTransport(host.getProtocol());
 		if (transport == null) {
 			Log.i(TAG, "No transport found for " + host.getProtocol());
@@ -289,6 +292,7 @@ public class TerminalBridge implements VDUDisplay {
 			@Override
 			public void run() {
 				transport.connect();
+				isConnecting = false;
 			}
 		});
 		connectionThread.setName("Connection");
@@ -445,6 +449,13 @@ public class TerminalBridge implements VDUDisplay {
 		if (transport != null)
 			return transport.isConnected();
 		return false;
+	}
+
+	/**
+	 * @return whether a connection is established
+	 */
+	public boolean isConnecting() {
+		return isConnecting;
 	}
 
 	/**
