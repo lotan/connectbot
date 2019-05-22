@@ -703,26 +703,30 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 	}
 
 	/**
-	 * If network is connected, attempt reconnect immediately.
+	 * Request reconnect of a TerminalBridge if all of the following
+	 * conditions are fulfilled:
+	 * - the bridge doesn't need a network or network is available
+	 * - the bridge is not connected already
+	 * - the bridge is not in the process of connecting
 	 *
-	 * @param bridge the TerminalBridge to reconnect when possible
+	 * @param bridge the TerminalBridge to reconnect
 	 */
 	public void requestReconnect(TerminalBridge bridge) {
-		synchronized (bridges) {
-			if (!bridge.isUsingNetwork() ||
-					connectivityManager.isConnected()) {
-				bridge.startConnection();
-			}
+		if (!bridge.isUsingNetwork() || connectivityManager.isConnected() &&
+		   !bridge.isConnected() &&
+		   !bridge.isConnecting()) {
+			bridge.startConnection();
 		}
 	}
 
 	/**
-	 * Reconnect all bridges that are disconnected but flagged to stay connected.
+	 * Reconnect all bridges that are checked "stay connected"
 	 */
 	private void reconnectPending() {
 		for (TerminalBridge bridge : bridges) {
-			if (!bridge.isConnecting() && !bridge.isConnected() && bridge.isStayConnected())
+			if (bridge.isStayConnected()) {
 				requestReconnect(bridge);
+			}
 		}
 	}
 
